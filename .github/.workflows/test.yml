@@ -1,0 +1,24 @@
+name: Docker Compose Test Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Đây là dòng quan trọng để kích hoạt nút bấm thủ công
+
+jobs:
+  test-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and Start Containers
+        run: docker-compose up -d
+
+      - name: Check Health
+        run: |
+          sleep 5
+          # Kiểm tra xem container có phản hồi HTTP 200 không
+          curl -I http://localhost:8099
