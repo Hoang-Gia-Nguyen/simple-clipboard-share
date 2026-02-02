@@ -1,9 +1,20 @@
+# services:
+#   notepad:
+#     image: php:8.1-apache-bullseye
+#     container_name: my_single_note
+#     ports:
+#       - "8099:80"
+#     volumes:
+#       - .:/var/www/html/   # Mount cả thư mục hiện tại vào container
+#     restart: always
+
 services:
-  notepad:
-    image: php:8.1-apache-bullseye
-    container_name: my_single_note
+  app:
+    # Build từ Dockerfile ở thư mục hiện tại (.)
+    build: . 
     ports:
       - "8099:80"
     volumes:
-      - .:/var/www/html/   # Mount cả thư mục hiện tại vào container
-    restart: always
+      # Ánh xạ file data.txt từ máy thật vào container
+      # Giúp dữ liệu không bị mất khi container bị xóa
+      - ./data-test.txt:/var/www/html/data.txt

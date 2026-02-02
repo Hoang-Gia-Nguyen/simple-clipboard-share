@@ -1,34 +1,43 @@
-## Project Overview
+# Simple Clipboard Share
 
-This project provides a simple note-taking web application using PHP and Docker Compose. The application allows users to edit and save text content.
+## Folder Structure
 
-## Prerequisites
+The project consists of the following folders and files:
 
-- Docker and Docker Compose installed on your system.
+- `app/`: Contains the application code.
+  - `index.php`: The main PHP script.
+  - `data.txt`: A text file used by the application.
 
-## Setup and Run
+- `data-test.txt`: A test file used for data persistence.
 
-1. Clone or download the project directory.
-2. Navigate to the project directory in your terminal.
-3. Run the following command to start the application:
-   ```
-   docker-compose up -d
-   ```
-   This will start the PHP application in detached mode.
+## Docker Configuration
 
-4. Access the application by navigating to `http://localhost:8099` in your web browser.
+The project uses Docker for containerization. The `Dockerfile` defines a PHP 8.1 image with an Apache server.
 
-## Application Usage
+### Dockerfile Overview
 
-- The application provides a simple text area for note-taking.
-- As you type, the application will automatically save your notes to a file named `data.txt` on the server.
-- The application displays the last saved status at the top right corner.
+1. **Base Image**: Uses `php:8.1-apache-bullseye` as the base image.
+2. **Working Directory**: Sets the working directory to `/var/www/html`.
+3. **File Copying**: Copies `index.php` and `data.txt` from the `app/` directory into the container.
+4. **Permissions**: Configures permissions for the Apache user.
+5. **Expose Port**: Exposes port 80 for the Apache server.
+
+### Docker Compose Configuration
+
+The `docker-compose.yml` file defines a service named `app` that:
+
+1. **Builds**: Builds the Docker image from the current directory's Dockerfile.
+2. **Ports**: Maps port 8090 on the host to port 80 in the container.
+3. **Volumes**: Mounts `data-test.txt` from the host into the container.
+
+## Usage
+
+To run the application:
+
+`docker compose up -d`
 
 ## Notes
 
-- Ensure you have write permissions in the project directory for the `data.txt` file.
-- You can stop the application by running `docker-compose down` in the terminal.
-
-## Future Enhancements
-
-- Implement additional features such as user authentication, data encryption, or more sophisticated saving mechanisms.
+- Ensure you have Docker installed on your system.
+- The application uses a PHP 8.1 image with Apache.
+- The `data-test.txt` file is used for data persistence and is mounted into the container.
