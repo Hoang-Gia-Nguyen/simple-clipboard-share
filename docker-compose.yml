@@ -1,0 +1,9 @@
+services:
+  notepad:
+    image: php:8.1-apache-bullseye
+    container_name: my_single_note
+    ports:
+      - "8099:80"
+    volumes:
+      - .:/var/www/html/   # Mount cả thư mục hiện tại vào container
+    restart: always
