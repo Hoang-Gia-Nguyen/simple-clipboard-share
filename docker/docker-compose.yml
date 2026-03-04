@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     image: hgnguyen37/simple-clipboard
     container_name: my_single_note
+    environment:
+      - SECRET_KEY=abcx
     ports:
       - "8099:80"
     volumes:
