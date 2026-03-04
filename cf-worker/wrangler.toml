@@ -1,0 +1,11 @@
+name = "quick-note"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+[[kv_namespaces]]
+binding = "QUICK_NOTE"
+id = "717085feb5fb4e2aaa8fcfa6410954d4"
+
+[[routes]]
+pattern = "bin.hgnlab.org"
+custom_domain = true

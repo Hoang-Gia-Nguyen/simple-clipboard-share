@@ -8,14 +8,14 @@ on:
   workflow_dispatch: # Đây là dòng quan trọng để kích hoạt nút bấm thủ công
 
 jobs:
-  test-app:
+  test-app-docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build and Start Containers
-        run: docker compose up -d
+        run: cd docker && docker compose up -d
 
       - name: Check Health
         run: |

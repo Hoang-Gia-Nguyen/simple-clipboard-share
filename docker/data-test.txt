@@ -1,0 +1,17 @@
+--- CLIPBOARD SYSTEM TEST ---
+Last Sync: 2026-02-02 10:00 AM
+Status: Connected to Docker Container
+
+Pending Tasks:
+- [x] Configure Dockerfile for PHP 8.1
+- [x] Set up Volume mapping for data persistence
+- [ ] Implement Security Headers
+
+Dev Snippet:
+docker compose up -d --build
+
+Notes:
+This file is mounted from the host machine. 
+Changes made here will persist even if the container is destroyed.
+
+-----------------------------

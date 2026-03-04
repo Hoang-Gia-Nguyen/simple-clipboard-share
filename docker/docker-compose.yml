@@ -1,5 +1,8 @@
 services:
   notepad:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: hgnguyen37/simple-clipboard
     container_name: my_single_note
     ports:
