@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: hgnguyen37/simple-clipboard
-    container_name: my_single_note
+    image: simple-text-bin
+    container_name: simple-text-bin
     environment:
       - SECRET_KEY=abcx
     ports:
