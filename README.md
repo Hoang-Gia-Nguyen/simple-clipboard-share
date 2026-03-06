@@ -1,5 +1,7 @@
 # Introduction
-This is a simple text bin. It has 2 methods to deploy:
+This is a simple text bin. Paste any snippet, get a short URL, and access it from any machine with a simple public url.
+
+It has 2 methods to deploy:
 * Cloudflare worker
 * Docker
 
@@ -18,12 +20,12 @@ To deploy as a Cloudflare Worker, follow these steps:
 To deploy using Docker, follow these steps:
 
 1. **Deployment**: Use `docker compose up -d --build` to deploy your application.
-   - **Secret Setup**: Before deployment, set up your secret indocker compose
+   - **Secret Setup**: Before deployment, set up your secret in docker compose
    ```
    environment:
       - SECRET_KEY=abcx
    ```
-2. **Access**: Once deployed, you can access your Cloudflare Worker via `https://your-docker-url/<SECRET_KEY>`
+2. **Access**: After deployment, your Cloudflare Worker can be reached at `https://<YOUR_DOCKER_HOST>:<PORT>/<SECRET_KEY>`. If you need public access, expose the Docker container’s port or use a reverse‑proxy; otherwise the service can run locally without any extra configuration.
 
 # Additional Information
 {{ TO DO: Add technical requirements, dependencies, and compatibility information }}
@@ -31,8 +33,5 @@ To deploy using Docker, follow these steps:
 # Troubleshooting
 {{ TO DO: List common issues and their solutions, including error messages and debugging tips }}
 
-# Conclusion
-{{ TO DO: Summarize main points and reiterate project purpose, including key features and benefits }}
-
 # Future Plans
-{{ TO DO: Outline upcoming developments, updates, and milestones, including planned features and roadmap }}
+- API endpoint for cli accessed.
