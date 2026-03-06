@@ -21,7 +21,7 @@ jobs:
         run: |
           sleep 5
           # Kiểm tra xem container có phản hồi HTTP 200 không
-          curl -I http://localhost:8099/?secret=abcx | grep -q "HTTP/1.1 200"
+          curl -I http://localhost:8099/abcx | grep -q "HTTP/1.1 200"
 
       - name: Check Health 401
         run: |
