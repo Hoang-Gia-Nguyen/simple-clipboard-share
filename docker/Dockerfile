@@ -5,9 +5,9 @@ FROM php:8.1-apache-bullseye
 WORKDIR /var/www/html
 
 # Bước 3: Copy toàn bộ code từ máy bạn vào container
-# (Bao gồm index.php và data.txt hiện có)
-COPY ./app/index.php /var/www/html/index.php
-COPY ./app/data.txt /var/www/html/data.txt
+# Copy toàn bộ nội dung trong thư mục app vào /var/www/html/
+RUN a2enmod rewrite
+COPY ./app/ /var/www/html/
 
 # Bước 4: Xử lý quyền hạn (CỰC KỲ QUAN TRỌNG)
 # Apache chạy dưới user 'www-data'. Ta cần cho user này sở hữu thư mục code

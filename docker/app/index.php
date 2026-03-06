@@ -3,10 +3,11 @@ $file = 'data.txt';
 $secret_key = getenv('SECRET_KEY'); // Key bảo mật của bạn
 
 // 1. KIỂM TRA BẢO MẬT
-if (!isset($_GET['secret']) || $_GET['secret'] !== $secret_key) {
-    header('HTTP/1.1 401 Unauthorized');
-    echo "<h1>401 Unauthorized</h1><p>Bạn không có quyền truy cập trang này.</p>";
-    exit;
+// So sánh tuyệt đối để xác thực
+$requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+if ($requestPath !== "/$secret_key") {
+    http_response_code(403);
+    die("Truy cập bị từ chối");
 }
 
 // 2. XỬ LÝ LƯU DỮ LIỆU (POST) - Vẫn giữ tham số secret khi fetch
@@ -46,10 +47,6 @@ $content = file_exists($file) ? htmlspecialchars(file_get_contents($file)) : '';
         const status = document.getElementById('status');
         let timer;
 
-        // Lấy secret từ URL hiện tại để gửi kèm trong request POST
-        const urlParams = new URLSearchParams(window.location.search);
-        const secret = urlParams.get('secret');
-
         note.addEventListener('input', () => {
             status.innerText = "Đang gõ...";
             clearTimeout(timer);
@@ -60,11 +57,6 @@ $content = file_exists($file) ? htmlspecialchars(file_get_contents($file)) : '';
                 fd.append('text', note.value);
 
                 try {
-                    // Gửi request kèm theo ?secret=abc để server cho phép ghi
-                    const res = await fetch(`?secret=${secret}`, { 
-                        method: 'POST', 
-                        body: fd 
-                    });
                     
                     if (res.ok) {
                         status.innerText = "Đã lưu lúc " + new Date().toLocaleTimeString();

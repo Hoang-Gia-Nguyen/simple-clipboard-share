@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: hgnguyen37/simple-clipboard
-    container_name: my_single_note
+    container_name: my_simple_note
     environment:
       - SECRET_KEY=abcx
     ports:

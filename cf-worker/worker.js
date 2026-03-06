@@ -1,6 +1,17 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
+
+    const path = url.pathname
+    const userAgent = request.headers.get("user-agent") || "unknown"
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown"
+
+    env.TEXTBIN_AE.writeDataPoint({
+      indexes: [path],
+      blobs: [userAgent, ip],
+      doubles: [Date.now()]
+    })
+
     if (url.pathname === '/favicon.ico') {
       return fetch('https://img.icons8.com/fluency/48/note.png')
     }
@@ -8,18 +19,17 @@ export default {
     const ALLOWED_URLS = [
       '/.well-known/appspecific/com.chrome.devtools.json',
       '/favicon.ico',
+      `/${env.EXPECTED_SECRET}`
     ]
 
-    const expectedSecret = env.EXPECTED_SECRET
+    // const expectedSecret = env.EXPECTED_SECRET
 
-    const urlParams = new URL(request.url).searchParams;
-    const secretFromUrl = urlParams.get('secret');
+    // const urlParams = new URL(request.url).searchParams;
+    // const secretFromUrl = urlParams.get('secret');
 
 
-    if (!ALLOWED_URLS.includes(url.pathname) && secretFromUrl !== expectedSecret) {
+    if (!ALLOWED_URLS.includes(url.pathname)) {
       console.log(url.href) // prints the full URL for debugging
-      console.log(expectedSecret) // prints the full URL for debugging
-      console.log(secretFromUrl)
       return new Response("Access denied", { status: 401 })
     }
 
