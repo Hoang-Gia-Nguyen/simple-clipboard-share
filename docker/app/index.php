@@ -6,7 +6,7 @@ $secret_key = getenv('SECRET_KEY'); // Key bảo mật của bạn
 // So sánh tuyệt đối để xác thực
 $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if ($requestPath !== "/$secret_key") {
-    http_response_code(403);
+    http_response_code(401);
     die("Truy cập bị từ chối");
 }
 
