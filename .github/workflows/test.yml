@@ -17,8 +17,14 @@ jobs:
       - name: Build and Start Containers
         run: cd docker && docker compose up -d --build
 
-      - name: Check Health
+      - name: Check Health 200
         run: |
           sleep 5
           # Kiểm tra xem container có phản hồi HTTP 200 không
-          curl -I http://localhost:8099
+          curl -I http://localhost:8099/abcx | grep -q "HTTP/1.1 200"
+
+      - name: Check Health 401
+        run: |
+          sleep 5
+          # Kiểm tra xem container có phản hồi HTTP 401 không
+          curl -I http://localhost:8099/ | grep -q "HTTP/1.1 401"
