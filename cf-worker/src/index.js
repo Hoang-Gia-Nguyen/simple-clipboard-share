@@ -18,7 +18,7 @@ export default {
   async fetch(request, env) {
     // 1. ENVIRONMENT VALIDATION
     if (!env.EXPECTED_SECRET) {
-      return new Response("Error: EXPECTED_SECRET environment variable is not set.", { status: 500 });
+      return new Response("Error: EXPECTED_SECRET environment variable is not set.", { status: 500, headers: this.corsHeaders });
     }
 
     const url = new URL(request.url)
@@ -45,22 +45,14 @@ export default {
       `/${env.EXPECTED_SECRET}`
     ]
 
-    if (!ALLOWED_URLS.includes(url.pathname)) {
-  // Return 403 for invalid secret (previously 401)
-  console.log(`Access denied for path: ${url.pathname}`);
-  return new Response("Access denied", { status: 403, headers: corsHeaders });
+    if (request.method === "OPTIONS") {
+  return new Response(null, { status: 200, headers: this.corsHeaders });
 }
-  // Return 403 for invalid secret (previously 401)
+
+if (!ALLOWED_URLS.includes(url.pathname)) {
   console.log(`Access denied for path: ${url.pathname}`);
-  return new Response("Access denied", { status: 403 });
+  return new Response("Access denied", { status: 403, headers: this.corsHeaders });
 }
-  // Return 403 for invalid secret (previously 401)
-  console.log(`Access denied for path: ${url.pathname}`);
-  return new Response("Access denied", { status: 403 });
-}
-      console.log(`Access denied for path: ${url.pathname}`)
-      return new Response("Access denied", { status: 401 })
-    }
 
     // ===== POST: Save data =====
     if (request.method === "POST") {
@@ -70,7 +62,7 @@ export default {
 
         await env.QUICK_NOTE.put("note", text)
 
-        return new Response("OK", { status: 200 })
+        return new Response("OK", { status: 200, headers: this.corsHeaders })
       } catch (e) {
         return new Response(
           "Error: Could not write to storage",
@@ -82,11 +74,7 @@ export default {
     // ===== GET: Load data =====
     const content = await env.QUICK_NOTE.get("note") || ""
 
-    const escaped = content
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
+    const escaped = this.escapeHTML(content)
 
     const html = `<!DOCTYPE html>
 <html>
@@ -178,7 +166,7 @@ export default {
 </html>`
 
     return new Response(html, {
-      headers: { "Content-Type": "text/html; charset=UTF-8" }
+      headers: { ...this.corsHeaders, "Content-Type": "text/html; charset=UTF-8" }
     })
   }
 }

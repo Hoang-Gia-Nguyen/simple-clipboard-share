@@ -14,6 +14,7 @@ To deploy as a Cloudflare Worker, follow these steps:
 3. **Local Development**: Run `wrangler dev` for local development. Ensure you have a `.env` file with the `EXPECTED_SECRET` value (refer `.example.env`).
 4. **Deployment**: Use `wrangler deploy` to deploy your Cloudflare Worker.
    - **Secret Setup**: Before deployment, set up your secret using `wrangler secret put EXPECTED_SECRET`
+   - **Behavior**: The worker now returns **403** for an invalid secret, includes **CORS** headers on all responses, and handles **OPTIONS** preflight requests.
 5. **Access**: Once deployed, you can access your Cloudflare Worker via `https://your-worker-url/<EXPECTED_SECRET>`
 
 ## Docker

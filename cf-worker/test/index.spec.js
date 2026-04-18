@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import worker from '../src';
 
 describe('Quick Note worker', () => {
-	it('responds with Access Denied if secret is missing', async () => {
+	it('responds with Access Denied (403) if secret is missing', async () => {
 		const request = new Request('http://example.com/wrong-secret');
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(request, env, ctx);
