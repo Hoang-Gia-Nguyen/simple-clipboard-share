@@ -1,32 +1,37 @@
 <?php
 $file = 'data.txt';
-$secret_key = getenv('SECRET_KEY'); // Key bảo mật của bạn
+$secret_key = getenv('SECRET_KEY');
 
-// 1. KIỂM TRA BẢO MẬT
-// So sánh tuyệt đối để xác thực
+// 1. ENVIRONMENT VALIDATION
+if (!$secret_key) {
+    http_response_code(500);
+    die("Error: SECRET_KEY environment variable is not set.");
+}
+
+// 2. SECURITY CHECK
 $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if ($requestPath !== "/$secret_key") {
     http_response_code(401);
-    die("Truy cập bị từ chối");
+    die("Access denied");
 }
 
-// 2. XỬ LÝ LƯU DỮ LIỆU (POST) - Vẫn giữ tham số secret khi fetch
+// 3. HANDLE SAVE (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = $_POST['text'] ?? '';
     if (file_put_contents($file, $input) !== false) {
         echo "OK";
     } else {
-        header('HTTP/1.1 500 Internal Error');
-        echo "Lỗi: Không có quyền ghi vào file data.txt";
+        http_response_code(500);
+        echo "Error: Cannot write to data.txt. Check file permissions.";
     }
     exit;
 }
 
-// 3. ĐỌC DỮ LIỆU (GET)
+// 4. READ DATA (GET)
 $content = file_exists($file) ? htmlspecialchars(file_get_contents($file)) : '';
 ?>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Quick Note (Secure)</title>
@@ -34,39 +39,69 @@ $content = file_exists($file) ? htmlspecialchars(file_get_contents($file)) : '';
     
     <style>
         body { margin: 0; background: #eee; font-family: sans-serif; }
-        #status { position: fixed; top: 5px; right: 5px; font-size: 12px; color: gray; z-index: 10; }
-        textarea { width: 100vw; height: 100vh; padding: 20px; border: none; outline: none; font-size: 18px; box-sizing: border-box; resize: none; }
+        #toolbar { position: fixed; top: 5px; right: 5px; display: flex; align-items: center; gap: 10px; z-index: 10; }
+        #status { font-size: 12px; color: gray; }
+        button { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; font-size: 12px; }
+        button:hover { background: #f0f0f0; }
+        textarea { width: 100vw; height: 100vh; padding: 20px; border: none; outline: none; font-size: 18px; box-sizing: border-box; resize: none; background: #fff; color: #000; }
+        
+        @media (prefers-color-scheme: dark) {
+            body { background: #222; }
+            textarea { background: #333; color: #eee; }
+            #status { color: #aaa; }
+            button { background: #444; color: #eee; border-color: #555; }
+            button:hover { background: #555; }
+        }
     </style>
 </head>
 <body>
-    <div id="status">Sẵn sàng (Bảo mật: Bật)</div>
-    <textarea id="note" placeholder="Bắt đầu nhập nội dung..."><?php echo $content; ?></textarea>
+    <div id="toolbar">
+        <div id="status">Ready (Security: On)</div>
+        <button id="copyBtn">Copy</button>
+    </div>
+    <textarea id="note" placeholder="Start typing..."><?php echo $content; ?></textarea>
 
     <script>
         const note = document.getElementById('note');
         const status = document.getElementById('status');
+        const copyBtn = document.getElementById('copyBtn');
         let timer;
 
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(note.value);
+                const oldText = copyBtn.innerText;
+                copyBtn.innerText = "Copied!";
+                setTimeout(() => copyBtn.innerText = oldText, 2000);
+            } catch (err) {
+                alert("Failed to copy text");
+            }
+        });
+
         note.addEventListener('input', () => {
-            status.innerText = "Đang gõ...";
+            status.innerText = "Typing...";
             clearTimeout(timer);
             timer = setTimeout(async () => {
-                status.innerText = "Đang lưu...";
+                status.innerText = "Saving...";
                 
                 const fd = new FormData();
                 fd.append('text', note.value);
 
                 try {
-                    
+                    const res = await fetch('', { method: 'POST', body: fd });
                     if (res.ok) {
-                        status.innerText = "Đã lưu lúc " + new Date().toLocaleTimeString();
+                        status.innerText = "Saved at " + new Date().toLocaleTimeString();
+                        status.style.color = "gray";
                     } else if (res.status === 401) {
-                        status.innerText = "LỖI: Sai mã bảo mật!";
+                        status.innerText = "ACCESS DENIED (Invalid secret)";
+                        status.style.color = "red";
                     } else {
-                        status.innerText = "LỖI SERVER (Quyền ghi file)";
+                        status.innerText = "SERVER ERROR (Check permissions)";
+                        status.style.color = "red";
                     }
                 } catch (e) {
-                    status.innerText = "LỖI KẾT NỐI";
+                    status.innerText = "CONNECTION ERROR";
+                    status.style.color = "red";
                 }
             }, 800);
         });
