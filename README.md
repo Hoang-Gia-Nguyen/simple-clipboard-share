@@ -36,3 +36,4 @@ To deploy using Docker, follow these steps:
 
 # Future Plans
 - API endpoint for cli accessed.
+# CI trigger
