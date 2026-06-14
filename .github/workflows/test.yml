@@ -55,6 +55,7 @@ jobs:
         run: |
           cp wrangler.example.toml wrangler.toml
           sed -i "s/your_kv_id/${{ secrets.KV_NAMESPACE_ID }}/g" wrangler.toml
+          sed -i "s/your\\.domain\\.com/bin.hgnlab.org/g" wrangler.toml
 
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy
