@@ -59,11 +59,6 @@ jobs:
           # Remove [vars] section so EXPECTED_SECRET can be set as a secret
           sed -i '/^\[ *vars *\]/,/^\[/{/^\[ *vars *\]/d; /^\[/!d;}' wrangler.toml
 
-      - name: Deploy to Cloudflare Workers
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-
       - name: Delete existing EXPECTED_SECRET env var (if any)
         run: |
           curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/413137e64b948d84ccd11c8b97614d1f/workers/scripts/quick-note/environment-variables/EXPECTED_SECRET" \
@@ -72,5 +67,10 @@ jobs:
 
       - name: Set EXPECTED_SECRET
         run: echo "${{ secrets.WORKER_SECRET }}" | npx wrangler secret put EXPECTED_SECRET
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
