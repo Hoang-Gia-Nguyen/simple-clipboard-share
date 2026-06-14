@@ -5,8 +5,14 @@ FROM php:8.1-apache-bullseye
 WORKDIR /var/www/html
 
 # Bước 3: Copy toàn bộ code từ máy bạn vào container
-# Copy toàn bộ nội dung trong thư mục app vào /var/www/html/
-RUN a2enmod rewrite
+# Forward Authorization header to PHP (needed for Bearer token auth via /save)
+RUN a2enmod rewrite && \
+    { \
+      echo '<IfModule mod_setenvif.c>'; \
+      echo '  SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1'; \
+      echo '</IfModule>'; \
+    } > /etc/apache2/conf-available/forward-auth.conf && \
+    a2enconf forward-auth
 COPY ./app/ /var/www/html/
 
 # Bước 4: Xử lý quyền hạn (CỰC KỲ QUAN TRỌNG)
