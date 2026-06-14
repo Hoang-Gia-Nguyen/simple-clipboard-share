@@ -1,0 +1,95 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker compose -f docker/docker-compose.yml build
+
+      - name: Start container
+        run: |
+          docker compose -f docker/docker-compose.yml up -d
+          echo "Waiting for container to be ready..."
+          sleep 3
+
+      - name: Smoke test — reject wrong password
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8099/auth \
+            -d "password=wrong")
+          if [ "$status" != "401" ]; then
+            echo "FAIL: Expected 401 for wrong password, got $status"
+            exit 1
+          fi
+          echo "PASS: wrong password returned $status"
+
+      - name: Smoke test — accept correct password
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8099/auth \
+            -d "password=abcx")
+          if [ "$status" != "200" ]; then
+            echo "FAIL: Expected 200 for correct password, got $status"
+            exit 1
+          fi
+          echo "PASS: correct password returned $status"
+
+      - name: Smoke test — save and read back
+        run: |
+          # Save some content
+          save_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8099/save \
+            -H "Authorization: Bearer abcx" \
+            -d "text=hello-docker-ci")
+          if [ "$save_status" != "200" ]; then
+            echo "FAIL: save returned $save_status"
+            exit 1
+          fi
+          # Read it back via auth
+          content=$(curl -s -X POST http://localhost:8099/auth \
+            -d "password=abcx")
+          if [ "$content" != "hello-docker-ci" ]; then
+            echo "FAIL: read back '$content', expected 'hello-docker-ci'"
+            exit 1
+          fi
+          echo "PASS: save and read back successful"
+
+      - name: Clean up
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
+
+  push:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: docker
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
