@@ -9,6 +9,4 @@ services:
       - SECRET_KEY=abcx
     ports:
       - "8099:80"
-    volumes:
-      - ./data-test.txt:/var/www/html/data.txt   # Mount personal txt file
     restart: always
