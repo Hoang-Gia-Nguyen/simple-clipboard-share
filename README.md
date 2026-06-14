@@ -12,10 +12,10 @@ To deploy as a Cloudflare Worker, follow these steps:
 1. **Prerequisite**: Install the Wrangler CLI.
 2. **Configuration**: Prefer using `wrangler.example.toml`. Update your information in this file and save as `wrangler.toml`.
 3. **Local Development**: Run `wrangler dev` for local development. Ensure you have a `.env` file with the `EXPECTED_SECRET` value (refer `.example.env`).
-4. **Deployment**: Use `wrangler deploy` to deploy your Cloudflare Worker.
-   - **Secret Setup**: Before deployment, set up your secret using `wrangler secret put EXPECTED_SECRET`
-   - **Behavior**: The worker now returns **403** for an invalid secret, includes **CORS** headers on all responses, and handles **OPTIONS** preflight requests.
-5. **Access**: Once deployed, you can access your Cloudflare Worker via `https://your-worker-url/<EXPECTED_SECRET>`
+4. **Deployment**:
+   - Set up your secret: `wrangler secret put EXPECTED_SECRET`
+   - Deploy: `wrangler deploy`
+5. **Access**: Visit the worker URL and enter your password (the `EXPECTED_SECRET` value) in the password prompt.
 
 ## Docker
 To deploy using Docker, follow these steps:
@@ -26,7 +26,7 @@ To deploy using Docker, follow these steps:
    environment:
       - SECRET_KEY=abcx
    ```
-2. **Access**: After deployment, your Cloudflare Worker can be reached at `https://<YOUR_DOCKER_HOST>:<PORT>/<SECRET_KEY>`. If you need public access, expose the Docker container’s port or use a reverse‑proxy; otherwise the service can run locally without any extra configuration.
+2. **Access**: After deployment, your service can be reached at `https://<YOUR_DOCKER_HOST>:<PORT>/`. Enter the secret key in the password prompt to access the note editor.
 
 # Additional Information
 {{ TO DO: Add technical requirements, dependencies, and compatibility information }}

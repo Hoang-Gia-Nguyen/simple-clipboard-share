@@ -6,6 +6,9 @@ compatibility_date = "2024-11-01"
 binding = "QUICK_NOTE"
 id = "your_kv_id"      #REQUIRED
 
+[ vars ]
+EXPECTED_SECRET = "test-secret"
+
 [[routes]] #OPTIONAL
 pattern = "your.domain.com"
 custom_domain = true
