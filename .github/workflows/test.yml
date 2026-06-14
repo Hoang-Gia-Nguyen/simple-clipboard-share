@@ -56,6 +56,8 @@ jobs:
           cp wrangler.example.toml wrangler.toml
           sed -i "s/your_kv_id/${{ secrets.KV_NAMESPACE_ID }}/g" wrangler.toml
           sed -i "s/your\\.domain\\.com/bin.hgnlab.org/g" wrangler.toml
+          # Remove [vars] section so EXPECTED_SECRET can be set as a secret
+          sed -i '/^\[vars\]/,/^\[/{/^\[vars\]/d; /^\[/!d;}' wrangler.toml
 
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy
