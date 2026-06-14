@@ -51,15 +51,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug - list files
-        run: ls -la && cat wrangler.toml
+      - name: Generate wrangler.toml from example
+        run: |
+          cp wrangler.example.toml wrangler.toml
+          sed -i "s/your_kv_id/${{ secrets.KV_NAMESPACE_ID }}/g" wrangler.toml
 
       - name: Deploy to Cloudflare Workers
-        run: npx wrangler deploy --config wrangler.toml src/index.js
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
 
       - name: Set EXPECTED_SECRET
-        run: echo "${{ secrets.WORKER_SECRET }}" | npx wrangler secret put EXPECTED_SECRET --config wrangler.toml
+        run: echo "${{ secrets.WORKER_SECRET }}" | npx wrangler secret put EXPECTED_SECRET
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
